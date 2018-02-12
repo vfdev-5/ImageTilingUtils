@@ -4,7 +4,10 @@ import unittest
 import numpy as np
 
 
-from tiling import ConstStrideTiles
+from tiling import ConstStrideTiles, ceil_int
+
+
+DEBUG_MODE = False
 
 
 class TestConstStrideTiles(unittest.TestCase):
@@ -38,6 +41,12 @@ class TestConstStrideTiles(unittest.TestCase):
         with self.assertRaises(AssertionError):
             ConstStrideTiles((100, 120), (10, 10), stride=(10, -10))
 
+    def test_wrong_index(self):
+
+        with self.assertRaises(IndexError):
+            tiles = ConstStrideTiles((100, 120), (10, 10), stride=(5, 5))
+            tiles[10000]
+
     def test_with_nodata(self):
 
         def _test(im_size, ts, scale, stride, origin):
@@ -54,7 +63,7 @@ class TestConstStrideTiles(unittest.TestCase):
 
             debug_msg += "n={}\n".format(len(tiles))
             self.assertGreater(len(tiles), 0, debug_msg)
-            self.assertLess(np.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / stride, debug_msg)
+            self.assertLess(np.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / tiles.stride[0], debug_msg)
 
             extent0, out_size0 = tiles[0]
             # Start at origin
@@ -71,9 +80,9 @@ class TestConstStrideTiles(unittest.TestCase):
                 self.assertEqual(d, (extent[2], extent[3]), debug_msg)
                 # Check if constant stride
                 if extent[0] - prev_extent[0] > 0:
-                    self.assertEqual(stride, extent[0] - prev_extent[0], debug_msg)
+                    self.assertEqual(tiles.stride[0], extent[0] - prev_extent[0], debug_msg)
                 if extent[1] - prev_extent[1] > 0:
-                    self.assertEqual(stride, extent[1] - prev_extent[1], debug_msg)
+                    self.assertEqual(tiles.stride[1], extent[1] - prev_extent[1], debug_msg)
                 else:
                     self.assertEqual(0, extent[1] - prev_extent[1], debug_msg)
 
@@ -85,15 +94,25 @@ class TestConstStrideTiles(unittest.TestCase):
             debug_msg += "extent={}, out_size={}\n".format(extent, _)
             self.assertLess(extent[0], im_size, debug_msg)
             self.assertLess(extent[1], im_size, debug_msg)
-            self.assertGreaterEqual(extent[0] + max(extent[2], stride), im_size, debug_msg)
-            self.assertGreaterEqual(extent[1] + max(extent[3], stride), im_size, debug_msg)
+            self.assertGreaterEqual(extent[0] + max(extent[2], tiles.stride[0]), im_size, debug_msg)
+            self.assertGreaterEqual(extent[1] + max(extent[3], tiles.stride[1]), im_size, debug_msg)
 
-        for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
-            for im_size in range(100, 120):
-                for ext in range(32, int(im_size * scale) - 1, 3):
-                    for stride in range(ext // 2, ext + 10, 3):
-                        for origin in range(-5, 5):
-                            _test(im_size, ext, scale, stride, origin)
+        if not DEBUG_MODE:
+            for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
+                for im_size in range(100, 120):
+                    for ext in range(32, int(im_size * scale) - 1, 3):
+                        for stride in range(int(ext * scale) // 2, int(ext * scale) + 10, 5):
+                            for origin in range(-5, 5):
+                                _test(im_size, ext, scale, stride, origin)
+
+    def test_as_iterator(self):
+        tiles = ConstStrideTiles((100, 120), (10, 10), stride=(5, 5))
+        counter = 0
+        for extent, out_size in tiles:
+            _extent, _out_size = tiles[counter]
+            self.assertEqual(extent, _extent)
+            self.assertEqual(out_size, _out_size)
+            counter += 1
 
     def test_without_nodata(self):
 
@@ -111,7 +130,7 @@ class TestConstStrideTiles(unittest.TestCase):
 
             debug_msg += "n={}\n".format(len(tiles))
             self.assertGreater(len(tiles), 0, debug_msg)
-            self.assertLess(np.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / stride, debug_msg)
+            self.assertLess(np.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / tiles.stride[0], debug_msg)
 
             extent0, out_size0 = tiles[0]
             # Start at origin but should be positive
@@ -145,7 +164,7 @@ class TestConstStrideTiles(unittest.TestCase):
                 if prev_extent[2] == tiles.tile_extent[0]:
                     # Check if constant stride
                     if extent[0] - prev_extent[0] > 0:
-                        self.assertEqual(stride, extent[0] - prev_extent[0],
+                        self.assertEqual(tiles.stride[0], extent[0] - prev_extent[0],
                                          debug_msg + var_debug_msg)
 
                     # Check if output size is the same
@@ -154,16 +173,16 @@ class TestConstStrideTiles(unittest.TestCase):
                     if extent[0] - prev_extent[0] > 0:
                         if prev_extent[0] == 0 and extent[0] + extent[2] < im_size:
                             # Check stride between the ends of tiles
-                            self.assertEqual(stride, extent[0] + extent[2] - prev_extent[0] - prev_extent[2],
+                            self.assertEqual(tiles.stride[1], extent[0] + extent[2] - prev_extent[0] - prev_extent[2],
                                              debug_msg + var_debug_msg)
                         elif prev_extent[0] > 0 and extent[0] + extent[2] == im_size:
                             # Check stride between the starts of tiles
-                            self.assertEqual(stride, extent[0] - prev_extent[0],
+                            self.assertEqual(tiles.stride[0], extent[0] - prev_extent[0],
                                              debug_msg + var_debug_msg)
 
                 if prev_extent[3] == tiles.tile_extent[1]:
                     if extent[1] - prev_extent[1] > 0:
-                        self.assertEqual(stride, extent[1] - prev_extent[1],
+                        self.assertEqual(tiles.stride[1], extent[1] - prev_extent[1],
                                          debug_msg + var_debug_msg)
                     else:
                         self.assertEqual(0, extent[1] - prev_extent[1], debug_msg + var_debug_msg)
@@ -172,10 +191,10 @@ class TestConstStrideTiles(unittest.TestCase):
                     if extent[1] - prev_extent[1] > 0:
                         if prev_extent[1] == 0 and extent[1] + extent[3] < im_size:
                             # Check stride between the ends of tiles
-                            self.assertEqual(stride, extent[1] + extent[3] - prev_extent[1] - prev_extent[3],
+                            self.assertEqual(tiles.stride[1], extent[1] + extent[3] - prev_extent[1] - prev_extent[3],
                                              debug_msg + var_debug_msg)
                         elif prev_extent[1] > 0 and extent[1] + extent[3] == im_size:
-                            self.assertEqual(stride, extent[1] - prev_extent[1],
+                            self.assertEqual(tiles.stride[1], extent[1] - prev_extent[1],
                                              debug_msg + var_debug_msg)
 
             # Check the last tile ends at the boundary or out side and starts inside
@@ -183,22 +202,26 @@ class TestConstStrideTiles(unittest.TestCase):
             debug_msg += "extent={}, out_size={}\n".format(extent, _)
             self.assertLess(extent[0], im_size, debug_msg)
             self.assertLess(extent[1], im_size, debug_msg)
-            if stride < tiles.tile_extent[0]:
+            if tiles.stride[0] < tiles.tile_extent[0]:
                 self.assertEqual(extent[0] + extent[2], im_size, debug_msg)
             else:
                 self.assertLessEqual(extent[0] + extent[2], im_size, debug_msg)
 
-            if stride < tiles.tile_extent[1]:
+            if tiles.stride[1] < tiles.tile_extent[1]:
                 self.assertEqual(extent[1] + extent[3], im_size, debug_msg)
             else:
                 self.assertLessEqual(extent[1] + extent[3], im_size, debug_msg)
 
-        for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
-            for im_size in range(100, 120):
-                for ext in range(32, int(im_size * scale) - 1, 3):
-                    for stride in range(ext // 2, ext + 10, 3):
-                        for origin in range(-5, 5):
-                            _test(im_size, ext, scale, stride, origin)
+        if not DEBUG_MODE:
+            for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
+                for im_size in range(100, 120):
+                    for ext in range(32, int(im_size * scale) - 1, 3):
+                        for stride in range(int(ext * scale) // 2, int(ext * scale) + 10, 5):
+                            for origin in range(-5, 5):
+                                _test(im_size, ext, scale, stride, origin)
+
+    def test_int_ceil(self):
+        self.assertEqual(2, ceil_int(1.789))
 
 
 if __name__ == "__main__":

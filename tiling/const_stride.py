@@ -71,8 +71,9 @@ class ConstStrideTiles(BaseTiles):
         Initialize tiles
         :param image_size: (list or tuple of int) input image size in pixels (width, height)
         :param tile_size: (list or tuple of int) output tile size in pixels (width, height)
-        :param stride: (list or tuple of int) horisontal and vertical strides in pixels.
-        Values need to be positive larger than 1 pixel.
+        :param stride: (list or tuple of int) horizontal and vertical strides in pixels.
+        Values need to be positive larger than 1 pixel. Stride value is impacted with scale and corresponds to a
+        sliding over scaled image.
         :param scale: (float) Scaling applied to the input image parameters before extracting tile's extent
         :param origin: (list or tuple of int) point in pixels in the original image from where to start the tiling.
         Values can be positive or negative
@@ -84,13 +85,10 @@ class ConstStrideTiles(BaseTiles):
             "Argument stride should be a tuple/list (sx, sy)"
         if isinstance(stride, int):
             stride = (stride, stride)
+        # Apply scale on the stride
+        stride = [int(np.floor(s / self.scale)) for s in stride]
         for v in stride:
-            assert v > 0, "Stride values should be larger than 1 pixel"
-
-        # Apply floor to tile extent (tile size / scale)
-        # Output size is then ceil(extent * scale), extent is <= tile_extent
-        # ceil(extent * scale) < ceil(tile_extent * scale) = ceil(floor(tile_extent / scale) * scale)<= tile_size
-        self.tile_extent = [int(np.floor(e)) for e in self.tile_extent]
+            assert v > 0, "Scaled stride values `floor(stride / scale)` should be larger than 1 pixel"
 
         self.stride = stride
         self.origin = origin

@@ -23,6 +23,7 @@ report/
 __pycache__/
 *.py[cod]
 *$py.class
+.pytest_cache
 
 # C extensions
 *.so

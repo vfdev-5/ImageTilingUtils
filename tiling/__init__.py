@@ -1,6 +1,9 @@
 from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
 
+import numpy as np
+
+
 __version__ = '0.1'
 
 
@@ -38,7 +41,10 @@ class BaseTiles(object):
         self.image_size = image_size
         self.tile_size = tile_size
         self.scale = float(scale)
-        self.tile_extent = [d / self.scale for d in self.tile_size]
+        # Apply floor to tile extent (tile size / scale)
+        # Output size is then ceil(extent * scale), extent is <= tile_extent
+        # ceil(extent * scale) < ceil(tile_extent * scale) = ceil(floor(tile_extent / scale) * scale)<= tile_size
+        self.tile_extent = [int(np.floor(d / self.scale)) for d in self.tile_size]
         self._index = 0
         self._max_index = 0
 
