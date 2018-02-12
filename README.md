@@ -1,5 +1,7 @@
 # Image Tiling Utils
 
+![Build Status](https://travis-ci.org/vfdev-5/ImageTilingUtils.svg?branch=master)
+
 Minimalistic set of image reader angostic tools to easily iterate over large images
 
 **Example 1**
