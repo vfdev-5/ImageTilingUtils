@@ -77,7 +77,7 @@ class ConstStrideTiles(BaseTiles):
         :param scale: (float) Scaling applied to the input image parameters before extracting tile's extent
         :param origin: (list or tuple of int) point in pixels in the original image from where to start the tiling.
         Values can be positive or negative
-        :param include_nodata: (bool) Inlcude or not nodata. If nodata is included than tile extents have all the
+        :param include_nodata: (bool) Include or not nodata. If nodata is included then tile extents have all the
         same size, otherwise tiles at boundaries will be reduced
         """
         super(ConstStrideTiles, self).__init__(image_size=image_size, tile_size=tile_size, scale=scale)
