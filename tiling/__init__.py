@@ -80,5 +80,4 @@ class BaseTiles(object):
     __next__ = next
 
 
-from .const_size import *
 from .const_stride import *
