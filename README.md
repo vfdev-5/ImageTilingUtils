@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/vfdev-5/ImageTilingUtils.svg?branch=master)](https://travis-ci.org/vfdev-5/ImageTilingUtils)
-[![Coverage Status](https://coveralls.io/repos/github/vfdev-5/ImageTilingUtils/badge.svg)](https://coveralls.io/github/vfdev-5/ImageTilingUtils)
+[![Coverage Status](https://coveralls.io/repos/github/vfdev-5/ImageTilingUtils/badge.svg?branch=master)](https://coveralls.io/github/vfdev-5/ImageTilingUtils?branch=master)
 
 # Image Tiling Utils
 Minimalistic set of image reader agnostic tools to easily iterate over large images
