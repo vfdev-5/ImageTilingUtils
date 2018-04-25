@@ -8,19 +8,20 @@ __version__ = '0.1'
 
 
 class BaseTiles(object):
-    """
-    Base class to tile an image.
+    """Base class to tile an image.
+
     See the implementations
         - ConstSizeTiles
     """
     __metaclass__ = ABCMeta
 
     def __init__(self, image_size, tile_size=(128, 128), scale=1.0):
-        """
-        Initialize tiles
-        :param image_size (list or tuple): input image size in pixels
-        :param tile_size (int or list or tuple): output tile size in pixels
-        :param scale:
+        """Initialize tiles
+
+        Args:
+            image_size (list or tuple): input image size in pixels
+            tile_size (int or list or tuple): output tile size in pixels
+            scale (float): tile scaling factor
         """
         assert isinstance(image_size, (tuple, list)) and len(image_size) == 2, \
             "Argument image_size should be a tuple/list (sx, sy)"
@@ -50,23 +51,22 @@ class BaseTiles(object):
 
     @abstractmethod
     def __len__(self):
-        """
-        Method to get total number of tiles
-        :return:
+        """Method to get total number of tiles
         """
 
     @abstractmethod
     def __getitem__(self, idx):
-        """
-        Method to get the tile at index
-        :param idx: (int)
-        :return:
+        """Method to get the tile at index
+
+        Args:
+            idx: (int)
         """
 
     def next(self):
-        """
-            Method to get current tile
-            :return: tile data (ndarray), tile extent (list) in the original image, in pixels
+        """Method to get next tile
+
+        Returns:
+            tile data (ndarray), tile extent (list) in the original image, in pixels
         """
         if self._index < 0 or self._index >= self._max_index:
             raise StopIteration()
