@@ -4,7 +4,7 @@ from abc import ABCMeta, abstractmethod
 import numpy as np
 
 
-__version__ = '0.1'
+__version__ = '0.1.1'
 
 
 class BaseTiles(object):
@@ -80,4 +80,4 @@ class BaseTiles(object):
     __next__ = next
 
 
-from .const_stride import *
+from tiling.const_stride import *
