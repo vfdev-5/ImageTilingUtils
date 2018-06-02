@@ -41,6 +41,12 @@ extent, out_size  = tiles[i]
 
 ## Installation:
 
+#### from pip
+```bash
+pip install tiling
+```
+
+#### from sources
 Package installation is very simple
 ```bash
 pip install git+https://github.com/vfdev-5/ImageTilingUtils.git

@@ -12,6 +12,10 @@ DEBUG_MODE = False
 
 class TestConstStrideTiles(unittest.TestCase):
 
+    def test_get_version(self):
+        from tiling import __version__
+        self.assertTrue(isinstance(__version__, str))
+
     def test_wrong_args(self):
 
         with self.assertRaises(AssertionError):

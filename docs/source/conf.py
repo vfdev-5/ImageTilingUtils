@@ -12,9 +12,6 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-import os
-import sys
-sys.path.insert(0, os.path.abspath('../..'))
 import tiling
 import sphinx_rtd_theme
 from recommonmark.parser import CommonMarkParser
@@ -27,9 +24,9 @@ copyright = '2018, vfdev-5'
 author = 'vfdev-5'
 
 # The short X.Y version
-version = 'master (' + tiling.__version__ + ' )'
+version = tiling.__version__
 # The full version, including alpha/beta/rc tags
-release = 'master'
+release = tiling.__version__
 
 
 # -- General configuration ---------------------------------------------------
