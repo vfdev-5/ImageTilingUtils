@@ -35,4 +35,4 @@ Basic usage:
 
 .. autoclass:: ConstSizeTiles
    :members:
-   :undoc-members:
+   :imported-members:

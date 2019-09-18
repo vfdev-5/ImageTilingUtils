@@ -64,4 +64,4 @@ Basic usage:
 
 .. autoclass:: ConstStrideTiles
    :members:
-   :undoc-members:
+   :imported-members:

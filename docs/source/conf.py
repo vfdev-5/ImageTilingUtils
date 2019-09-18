@@ -20,7 +20,7 @@ from recommonmark.parser import CommonMarkParser
 # -- Project information -----------------------------------------------------
 
 project = 'ImageTilingUtils'
-copyright = '2018, vfdev-5'
+copyright = '2019, vfdev-5'
 author = 'vfdev-5'
 
 # The short X.Y version
