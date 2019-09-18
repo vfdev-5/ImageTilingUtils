@@ -1,8 +1,6 @@
 # -*- coding:utf-8 -*-
 import logging
-import math
-
-from tiling import BaseTiles
+from tiling import BaseTiles, ceil_int
 
 
 logger = logging.getLogger('tiling')
@@ -125,7 +123,3 @@ class ConstSizeTiles(BaseTiles):
         overlapping = delta / (n - 1)
         """
         return (tile_size * n - image_size) * 1.0 / (n - 1.0) if n > 1 else 0
-
-
-def ceil_int(x):
-    return int(math.ceil(x))

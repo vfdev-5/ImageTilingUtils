@@ -1,4 +1,6 @@
 from abc import ABCMeta, abstractmethod
+import math
+from collections.abc import Sequence
 
 from six import with_metaclass
 
@@ -15,14 +17,13 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
     """
 
     def __init__(self, image_size, tile_size=(128, 128), scale=1.0):
+        """Initialize tiles
+
+        Args:
+            image_size (list/tuple): input image size in pixels
+            tile_size (int or list/tuple): output tile size in pixels
+            scale (float): tile scaling factor
         """
-        Initialize tiles
-        :param image_size (list/tuple): input image size in pixels
-        :param tile_size (int or list/tuple of int): output tile size in pixels
-        :param scale:
-        """
-        import math
-        from collections.abc import Sequence
 
         if not (isinstance(image_size, Sequence) and len(image_size) == 2):
             raise TypeError("Argument image_size should be (sx, sy)")
@@ -58,23 +59,22 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
 
     @abstractmethod
     def __len__(self):
-        """
-        Method to get total number of tiles
-        :return:
+        """Method to get total number of tiles
         """
 
     @abstractmethod
     def __getitem__(self, idx):
-        """
-        Method to get the tile at index
-        :param idx: (int)
-        :return:
+        """Method to get the tile at index
+
+        Args:
+            idx: (int)
         """
 
     def next(self):
-        """
-            Method to get current tile
-            :return: tile data (ndarray), tile extent (list) in the original image, in pixels
+        """Method to get next tile
+
+        Returns:
+            tile data (ndarray), tile extent (list) in the original image, in pixels
         """
         if self._index < 0 or self._index >= self._max_index:
             raise StopIteration()
@@ -88,5 +88,9 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
     __next__ = next
 
 
-from .const_size import *
-from .const_stride import *
+def ceil_int(x):
+    return int(math.ceil(x))
+
+
+from tiling.const_stride import ConstStrideTiles
+from tiling.const_size import ConstSizeTiles
