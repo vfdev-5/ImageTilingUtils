@@ -1,42 +1,55 @@
-from __future__ import absolute_import
 from abc import ABCMeta, abstractmethod
-import numpy as np
+import math
+
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
+
+from six import with_metaclass
 
 
-__version__ = '0.1.2'
+__version__ = '0.2.0'
 
 
-class BaseTiles(object):
-    """Base class to tile an image.
-
+class BaseTiles(with_metaclass(ABCMeta, object)):
+    """
+    Base class to tile an image.
     See the implementations
         - ConstSizeTiles
+        - ConstStrideTiles
     """
-    __metaclass__ = ABCMeta
 
     def __init__(self, image_size, tile_size=(128, 128), scale=1.0):
         """Initialize tiles
 
         Args:
-            image_size (list or tuple): input image size in pixels
-            tile_size (int or list or tuple): output tile size in pixels
+            image_size (list/tuple): input image size in pixels
+            tile_size (int or list/tuple): output tile size in pixels
             scale (float): tile scaling factor
         """
-        assert isinstance(image_size, (tuple, list)) and len(image_size) == 2, \
-            "Argument image_size should be a tuple/list (sx, sy)"
+
+        if not (isinstance(image_size, Sequence) and len(image_size) == 2):
+            raise TypeError("Argument image_size should be (sx, sy)")
         for s in image_size:
-            assert s > 0, "Values of image_size should be positive"
-        assert isinstance(tile_size, int) or (isinstance(tile_size, (tuple, list)) and len(tile_size) == 2), \
-            "Argument tile_size should be a tuple/list (sx, sy)"
+            if s < 1:
+                raise ValueError("Values of image_size should be positive")
+
+        if not (isinstance(tile_size, int) or (isinstance(tile_size, Sequence) and len(tile_size) == 2)):
+            raise TypeError("Argument tile_size should be either int or pair of integers (sx, sy)")
         if isinstance(tile_size, int):
             tile_size = (tile_size, tile_size)
         for s in tile_size:
-            assert s > 0, "Values of image_size should be positive"
-        assert scale > 0, "Argument scale should be positive"
+            if s < 1:
+                raise ValueError("Values of tile_size should be positive")
+
+        if scale <= 0:
+            raise ValueError("Argument scale should be positive")
 
         for tile_dim, img_dim in zip(tile_size, image_size):
-            assert int(tile_dim / scale) < img_dim, \
-                "Scale and tile size should not be larger than image size"
+            if int(tile_dim / scale) >= img_dim:
+                raise ValueError("Scale {} and tile size {} should not be larger "
+                                 "than image size {}".format(scale, tile_dim, img_dim))
 
         self.image_size = image_size
         self.tile_size = tile_size
@@ -44,7 +57,7 @@ class BaseTiles(object):
         # Apply floor to tile extent (tile size / scale)
         # Output size is then ceil(extent * scale), extent is <= tile_extent
         # ceil(extent * scale) < ceil(tile_extent * scale) = ceil(floor(tile_extent / scale) * scale)<= tile_size
-        self.tile_extent = [int(np.floor(d / self.scale)) for d in self.tile_size]
+        self.tile_extent = [int(math.floor(d / self.scale)) for d in self.tile_size]
         self._index = 0
         self._max_index = 0
 
@@ -79,4 +92,9 @@ class BaseTiles(object):
     __next__ = next
 
 
-from tiling.const_stride import *
+def ceil_int(x):
+    return int(math.ceil(x))
+
+
+from tiling.const_stride import ConstStrideTiles
+from tiling.const_size import ConstSizeTiles

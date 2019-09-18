@@ -1,13 +1,10 @@
 
 import unittest
 
-import numpy as np
+import math
 
 
 from tiling import ConstStrideTiles, ceil_int
-
-
-DEBUG_MODE = False
 
 
 class TestConstStrideTiles(unittest.TestCase):
@@ -18,31 +15,33 @@ class TestConstStrideTiles(unittest.TestCase):
 
     def test_wrong_args(self):
 
-        with self.assertRaises(AssertionError):
+        assertRaisesRegex = self.assertRaisesRegex if hasattr(self, 'assertRaisesRegex') else self.assertRaisesRegexp
+
+        with assertRaisesRegex(TypeError, "Argument image_size should be"):
             ConstStrideTiles(1.0, 1.0)
 
-        with self.assertRaises(AssertionError):
-            ConstStrideTiles(100, 1.0)
+        with assertRaisesRegex(ValueError, "Values of image_size should be positive"):
+            ConstStrideTiles((0, 0), 1.0)
 
-        with self.assertRaises(AssertionError):
-            ConstStrideTiles(100, -10)
+        with assertRaisesRegex(TypeError, "Argument tile_size should be either int or pair of integers"):
+            ConstStrideTiles((100, 100), "abc")
 
-        with self.assertRaises(AssertionError):
-            ConstStrideTiles(-100, 10)
+        with assertRaisesRegex(ValueError, "Values of tile_size should be positive"):
+            ConstStrideTiles((100, 100), -1)
 
-        with self.assertRaises(AssertionError):
-            ConstStrideTiles(100, 100)
-
-        with self.assertRaises(AssertionError):
-            ConstStrideTiles((100, 120), 100)
-
-        with self.assertRaises(AssertionError):
+        with assertRaisesRegex(ValueError, "Values of tile_size should be positive"):
             ConstStrideTiles((100, 120), (10, -10))
 
-        with self.assertRaises(AssertionError):
-            ConstStrideTiles((100, 120), (10, 10), stride=-10)
+        with assertRaisesRegex(ValueError, "Argument scale should be positive"):
+            ConstStrideTiles((100, 120), (10, 10), scale=0.0)
 
-        with self.assertRaises(AssertionError):
+        with assertRaisesRegex(ValueError, "should not be larger than image size"):
+            ConstStrideTiles((1, 1), (10, 10), scale=1.0)
+
+        with assertRaisesRegex(TypeError, "Argument stride should be"):
+            ConstStrideTiles((100, 120), (10, 10), stride="abc")
+
+        with assertRaisesRegex(ValueError, "should be larger than 1 pixel"):
             ConstStrideTiles((100, 120), (10, 10), stride=(10, -10))
 
     def test_wrong_index(self):
@@ -67,7 +66,7 @@ class TestConstStrideTiles(unittest.TestCase):
 
             debug_msg += "n={}\n".format(len(tiles))
             self.assertGreater(len(tiles), 0, debug_msg)
-            self.assertLess(np.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / tiles.stride[0], debug_msg)
+            self.assertLess(math.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / tiles.stride[0], debug_msg)
 
             extent0, out_size0 = tiles[0]
             # Start at origin
@@ -101,13 +100,12 @@ class TestConstStrideTiles(unittest.TestCase):
             self.assertGreaterEqual(extent[0] + max(extent[2], tiles.stride[0]), im_size, debug_msg)
             self.assertGreaterEqual(extent[1] + max(extent[3], tiles.stride[1]), im_size, debug_msg)
 
-        if not DEBUG_MODE:
-            for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
-                for im_size in range(100, 120):
-                    for ext in range(32, int(im_size * scale) - 1, 3):
-                        for stride in range(int(ext * scale) // 2, int(ext * scale) + 10, 5):
-                            for origin in range(-5, 5):
-                                _test(im_size, ext, scale, stride, origin)
+        for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
+            for im_size in range(100, 120):
+                for ext in range(32, int(im_size * scale) - 1, 3):
+                    for stride in range(int(ext * scale) // 2, int(ext * scale) + 10, 5):
+                        for origin in range(-5, 5):
+                            _test(im_size, ext, scale, stride, origin)
 
     def test_as_iterator(self):
         tiles = ConstStrideTiles((100, 120), (10, 10), stride=(5, 5))
@@ -117,6 +115,12 @@ class TestConstStrideTiles(unittest.TestCase):
             self.assertEqual(extent, _extent)
             self.assertEqual(out_size, _out_size)
             counter += 1
+
+        for i, j in [(len(tiles) - 1, -1), (len(tiles) - 2, -2), (len(tiles) - 3, -3)]:
+            extent1, out_size1 = tiles[i]
+            extent2, out_size2 = tiles[j]
+            self.assertEqual(extent1, extent2)
+            self.assertEqual(out_size1, out_size2)
 
     def test_without_nodata(self):
 
@@ -134,7 +138,7 @@ class TestConstStrideTiles(unittest.TestCase):
 
             debug_msg += "n={}\n".format(len(tiles))
             self.assertGreater(len(tiles), 0, debug_msg)
-            self.assertLess(np.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / tiles.stride[0], debug_msg)
+            self.assertLess(math.sqrt(len(tiles)), 1 + (im_size - origin) * 1.0 / tiles.stride[0], debug_msg)
 
             extent0, out_size0 = tiles[0]
             # Start at origin but should be positive
@@ -216,13 +220,12 @@ class TestConstStrideTiles(unittest.TestCase):
             else:
                 self.assertLessEqual(extent[1] + extent[3], im_size, debug_msg)
 
-        if not DEBUG_MODE:
-            for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
-                for im_size in range(100, 120):
-                    for ext in range(32, int(im_size * scale) - 1, 3):
-                        for stride in range(int(ext * scale) // 2, int(ext * scale) + 10, 5):
-                            for origin in range(-5, 5):
-                                _test(im_size, ext, scale, stride, origin)
+        for scale in [0.7, 0.89, 0.99, 1.0, 1.78, 2.12]:
+            for im_size in range(100, 120):
+                for ext in range(32, int(im_size * scale) - 1, 3):
+                    for stride in range(int(ext * scale) // 2, int(ext * scale) + 10, 5):
+                        for origin in range(-5, 5):
+                            _test(im_size, ext, scale, stride, origin)
 
     def test_int_ceil(self):
         self.assertEqual(2, ceil_int(1.789))

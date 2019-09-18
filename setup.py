@@ -32,7 +32,7 @@ setup(
     url="https://github.com/vfdev-5/ImageTilingUtils",
     packages=find_packages(exclude=['tests', 'examples']),
     install_requires=[
-        'numpy',
+        'six',
     ],
     license='MIT',
     test_suite="tests",

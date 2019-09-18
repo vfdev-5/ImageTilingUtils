@@ -13,7 +13,14 @@ Minimalistic set of image reader agnostic tools to easily iterate over large ima
 Installation
 ------------
 
-Package installation is very simple
+Package installation with `pip`
+
+.. code-block:: bash
+
+   pip install tiling
+
+
+Package installation from sources
 
 .. code-block:: bash
 
@@ -23,7 +30,7 @@ Package installation is very simple
 Examples
 --------
 
-For more practical examples, see this `notebook <https://github.com/vfdev-5/ImageTilingUtils/blob/master/examples/example_const_stride_tiling.ipynb>`_.
+For more practical examples, see `notebooks <https://github.com/vfdev-5/ImageTilingUtils/blob/master/examples/>`_.
 
 
 .. toctree::
@@ -37,3 +44,4 @@ For more practical examples, see this `notebook <https://github.com/vfdev-5/Imag
    :caption: Package Reference
 
    const_stride
+   const_size

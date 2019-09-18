@@ -54,7 +54,7 @@ Basic usage:
     tiles = ConstStrideTiles(image_size=(500, 500), tile_size=(256, 256), stride=(100, 100))
 
     print("Number of tiles: %i" % len(tiles))
-    for x, y, width, height, out_width, out_height in tiles:
+    for (x, y, width, height), (out_width, out_height) in tiles:
         data = read_data(x, y, width, height, out_width, out_height)
         print("data.shape: {}".format(data.shape))
 
