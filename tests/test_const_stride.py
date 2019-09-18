@@ -15,31 +15,33 @@ class TestConstStrideTiles(unittest.TestCase):
 
     def test_wrong_args(self):
 
-        with self.assertRaisesRegex(TypeError, "Argument image_size should be"):
+        assertRaisesRegex = self.assertRaisesRegex if hasattr(self, 'assertRaisesRegex') else self.assertRaisesRegexp
+
+        with assertRaisesRegex(TypeError, "Argument image_size should be"):
             ConstStrideTiles(1.0, 1.0)
 
-        with self.assertRaisesRegex(ValueError, "Values of image_size should be positive"):
+        with assertRaisesRegex(ValueError, "Values of image_size should be positive"):
             ConstStrideTiles((0, 0), 1.0)
 
-        with self.assertRaisesRegex(TypeError, "Argument tile_size should be either int or pair of integers"):
+        with assertRaisesRegex(TypeError, "Argument tile_size should be either int or pair of integers"):
             ConstStrideTiles((100, 100), "abc")
 
-        with self.assertRaisesRegex(ValueError, "Values of tile_size should be positive"):
+        with assertRaisesRegex(ValueError, "Values of tile_size should be positive"):
             ConstStrideTiles((100, 100), -1)
 
-        with self.assertRaisesRegex(ValueError, "Values of tile_size should be positive"):
+        with assertRaisesRegex(ValueError, "Values of tile_size should be positive"):
             ConstStrideTiles((100, 120), (10, -10))
 
-        with self.assertRaisesRegex(ValueError, "Argument scale should be positive"):
+        with assertRaisesRegex(ValueError, "Argument scale should be positive"):
             ConstStrideTiles((100, 120), (10, 10), scale=0.0)
 
-        with self.assertRaisesRegex(ValueError, "should not be larger than image size"):
+        with assertRaisesRegex(ValueError, "should not be larger than image size"):
             ConstStrideTiles((1, 1), (10, 10), scale=1.0)
 
-        with self.assertRaisesRegex(TypeError, "Argument stride should be"):
+        with assertRaisesRegex(TypeError, "Argument stride should be"):
             ConstStrideTiles((100, 120), (10, 10), stride="abc")
 
-        with self.assertRaisesRegex(ValueError, "should be larger than 1 pixel"):
+        with assertRaisesRegex(ValueError, "should be larger than 1 pixel"):
             ConstStrideTiles((100, 120), (10, 10), stride=(10, -10))
 
     def test_wrong_index(self):

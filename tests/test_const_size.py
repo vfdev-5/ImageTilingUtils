@@ -9,13 +9,15 @@ class TestConstSizeTiles(unittest.TestCase):
 
     def test_wrong_args(self):
 
-        with self.assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
+        assertRaisesRegex = self.assertRaisesRegex if hasattr(self, 'assertRaisesRegex') else self.assertRaisesRegexp
+
+        with assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
             ConstSizeTiles((500, 500), (256, 256), min_overlapping=-1)
 
-        with self.assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
+        with assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
             ConstSizeTiles((500, 500), (256, 256), min_overlapping=300)
 
-        with self.assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
+        with assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
             ConstSizeTiles((500, 500), (256, 256), min_overlapping=256)
 
     def test_wrong_index(self):

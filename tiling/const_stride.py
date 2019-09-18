@@ -2,7 +2,10 @@
 import logging
 import math
 
-from collections.abc import Sequence
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 
 from tiling import BaseTiles, ceil_int
 

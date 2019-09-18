@@ -1,6 +1,10 @@
 from abc import ABCMeta, abstractmethod
 import math
-from collections.abc import Sequence
+
+try:
+    from collections.abc import Sequence
+except ImportError:
+    from collections import Sequence
 
 from six import with_metaclass
 
