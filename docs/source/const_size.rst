@@ -35,4 +35,5 @@ Basic usage:
 
 .. autoclass:: ConstSizeTiles
    :members:
-   :imported-members:
+   :inherited-members:
+

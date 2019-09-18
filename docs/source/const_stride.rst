@@ -64,4 +64,4 @@ Basic usage:
 
 .. autoclass:: ConstStrideTiles
    :members:
-   :imported-members:
+   :inherited-members:
