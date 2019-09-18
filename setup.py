@@ -11,13 +11,13 @@ with codecs_open('README.md', encoding='utf-8') as f:
 setup(
     name="tiling",
     version=__version__,
-    description=u"Minimalistic set of image reader angostic tools to easily iterate over large images",
+    description=u"Minimalistic set of image reader agnostic tools to easily iterate over large images",
     long_description=long_description,
     author="vfdev-5",
     author_email="vfdev dot 5 at gmail dot com",
     packages=find_packages(exclude=['tests', 'examples']),
     install_requires=[
-        'numpy',
+        'six',
     ],
     license='MIT',
     test_suite="tests",

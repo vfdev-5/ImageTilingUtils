@@ -1,16 +1,12 @@
 # -*- coding:utf-8 -*-
-from __future__ import absolute_import
-
-# Python
 import logging
+import math
 
-# Numpy
-import numpy as np
+from collections.abc import Sequence
 
+from tiling import BaseTiles
 
 logger = logging.getLogger('tiling')
-
-from . import BaseTiles
 
 
 class ConstStrideTiles(BaseTiles):
@@ -58,7 +54,7 @@ class ConstStrideTiles(BaseTiles):
     tiles = ConstStrideTiles(image_size=(500, 500), tile_size=(256, 256), stride=(100, 100))
 
     print("Number of tiles: %i" % len(tiles))
-    for x, y, width, height, out_width, out_height in tiles:
+    for (x, y, width, height), out_width, out_height in tiles:
         data = read_data(x, y, width, height, out_width, out_height)
         print("data.shape: {}".format(data.shape))
 
@@ -69,26 +65,30 @@ class ConstStrideTiles(BaseTiles):
     def __init__(self, image_size, tile_size, stride=(1, 1), scale=1.0, origin=(0, 0), include_nodata=True):
         """
         Initialize tiles
-        :param image_size: (list or tuple of int) input image size in pixels (width, height)
-        :param tile_size: (list or tuple of int) output tile size in pixels (width, height)
-        :param stride: (list or tuple of int) horizontal and vertical strides in pixels.
-        Values need to be positive larger than 1 pixel. Stride value is impacted with scale and corresponds to a
-        sliding over scaled image.
+        :param image_size: (list/tuple of int) input image size in pixels (width, height).
+        :param tile_size: (int or list/tuple of int) output tile size in pixels (width, height).
+        :param stride: (int or list/tuple of int) horizontal and vertical strides in pixels.
+            Values need to be positive larger than 1 pixel. Stride value is impacted with scale and corresponds to a
+            sliding over scaled image.
         :param scale: (float) Scaling applied to the input image parameters before extracting tile's extent
         :param origin: (list or tuple of int) point in pixels in the original image from where to start the tiling.
-        Values can be positive or negative
+            Values can be positive or negative.
         :param include_nodata: (bool) Include or not nodata. If nodata is included then tile extents have all the
-        same size, otherwise tiles at boundaries will be reduced
+            same size, otherwise tiles at boundaries will be reduced.
         """
         super(ConstStrideTiles, self).__init__(image_size=image_size, tile_size=tile_size, scale=scale)
-        assert isinstance(stride, int) or (isinstance(stride, (tuple, list)) and len(stride) == 2), \
-            "Argument stride should be a tuple/list (sx, sy)"
+
+        if not (isinstance(stride, int) or (isinstance(stride, Sequence) and len(stride) == 2)):
+            raise TypeError("Argument stride should be (sx, sy)")
+
         if isinstance(stride, int):
             stride = (stride, stride)
+
         # Apply scale on the stride
-        stride = [int(np.floor(s / self.scale)) for s in stride]
+        stride = [int(math.floor(s / self.scale)) for s in stride]
         for v in stride:
-            assert v > 0, "Scaled stride values `floor(stride / scale)` should be larger than 1 pixel"
+            if v < 1:
+                raise ValueError("Scaled stride values `floor(stride / scale)` should be larger than 1 pixel")
 
         self.stride = stride
         self.origin = origin
@@ -127,19 +127,19 @@ class ConstStrideTiles(BaseTiles):
         Method to compute tile output size for a given computed extent.
         """
         if computed_extent < tile_extent:
-            return int(np.ceil(np.float32(computed_extent * scale)))
+            return int(math.ceil(1.0 * computed_extent * scale))
         return tile_size
 
     def __getitem__(self, idx):
         """
         Method to get the tile at index `idx`
         :param idx: (int) tile index between `0` and `len(tiles)`
-        :return: (tuple) tile extent, output size
-        Tile extent in pixels: x offset, y offset, x tile extent, y tile extent.
-        If scale is 1.0, then x tile extent, y tile extent are equal to tile size
-        Output size in pixels: output width, height. If include_nodata is False and other parameters are such that
-        tiles can go outside the image, then tile extent and output size are cropped at boundaries.
-        Otherwise, output size is equal the input tile size.
+        :return: (tuple) tile extent, output size.
+            Tile extent in pixels: x offset, y offset, x tile extent, y tile extent.
+            If scale is 1.0, then x tile extent, y tile extent are equal to tile size
+            Output size in pixels: output width, height. If include_nodata is False and other parameters are such that
+            tiles can go outside the image, then tile extent and output size are cropped at boundaries.
+            Otherwise, output size is equal the input tile size.
         """
         if idx < -self._max_index or idx >= self._max_index:
             raise IndexError("Index %i is out of ranges %i and %i" % (idx, 0, self._max_index))
@@ -166,8 +166,8 @@ class ConstStrideTiles(BaseTiles):
         Method to compute number of overlapping tiles
         """
         max_extent = max(tile_extent, stride)
-        return max(int(np.ceil(1 + (image_size - max_extent - origin) * 1.0 / stride)), 1)
+        return max(int(math.ceil(1 + (image_size - max_extent - origin) * 1.0 / stride)), 1)
 
 
 def ceil_int(x):
-    return int(np.ceil(x))
+    return int(math.ceil(x))
