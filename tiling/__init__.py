@@ -9,7 +9,7 @@ except ImportError:
 from six import with_metaclass
 
 
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 
 class BaseTiles(with_metaclass(ABCMeta, object)):

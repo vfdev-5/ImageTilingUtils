@@ -1,6 +1,5 @@
 
 import unittest
-import math
 
 from tiling import ConstSizeTiles
 
@@ -43,9 +42,10 @@ class TestConstSizeTiles(unittest.TestCase):
     def test_as_iterator(self):
         tiles = ConstSizeTiles((100, 120), (10, 10), min_overlapping=5)
         counter = 0
-        for extent in tiles:
-            _extent = tiles[counter]
+        for extent, _ in tiles:
+            _extent, _out_size = tiles[counter]
             self.assertEqual(extent, _extent)
+            self.assertEqual(tiles.tile_size, _out_size)
             counter += 1
 
         for i, j in [(len(tiles) - 1, -1), (len(tiles) - 2, -2), (len(tiles) - 3, -3)]:
@@ -67,7 +67,7 @@ class TestConstSizeTiles(unittest.TestCase):
             debug_msg += "n={}\n".format(len(tiles))
             self.assertGreater(len(tiles), 0, debug_msg)
 
-            extent0 = tiles[0]
+            extent0, out_size = tiles[0]
             # Start at origin but should be positive
             debug_msg += "extent0={}\n".format(extent0)
             self.assertEqual((extent0[0], extent0[1]), (0, 0), debug_msg)
@@ -76,8 +76,8 @@ class TestConstSizeTiles(unittest.TestCase):
             self.assertLessEqual((extent0[2], extent0[3]), (ts / scale, ts / scale), debug_msg)
 
             for i in range(1, len(tiles)):
-                extent = tiles[i]
-                prev_extent = tiles[i - 1]
+                extent, _ = tiles[i]
+                prev_extent, _ = tiles[i - 1]
                 var_debug_msg = "i={} extent={}\n" \
                     .format(i, extent)
                 var_debug_msg += "prev_extent={}\n" \
@@ -89,7 +89,7 @@ class TestConstSizeTiles(unittest.TestCase):
                                             debug_msg + var_debug_msg)
 
             # Check the last tile ends at the boundary
-            extent = tiles[-1]
+            extent, _ = tiles[-1]
             debug_msg += "extent={}\n".format(extent)
             for j in [0, 1]:
                 self.assertLess(extent[j], im_size, debug_msg)

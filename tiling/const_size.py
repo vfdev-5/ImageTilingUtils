@@ -10,6 +10,22 @@ class ConstSizeTiles(BaseTiles):
     """Class provides constant size tile parameters (offset, extent) to extract data from image.
     Generated tile extents can overlap and do not includes nodata paddings.
 
+    Examples:
+
+        .. code-block:: python
+
+            from tiling import ConstSizeTiles
+
+            tiles = ConstSizeTiles(image_size=(500, 500), tile_size=(256, 256), min_overlapping=15, scale=1.0)
+
+            print("Number of tiles: %i" % len(tiles))
+            for extent, out_size in tiles:
+                x, y, width, height = extent
+                data = read_data(x, y, width, height,
+                                 out_width=out_size[0],
+                                 out_height=out_size[1])
+                print("data.shape: {}".format(data.shape))
+
     Args:
         image_size (list/tuple of int): input image size in pixels (width, height)
         tile_size (int or list/tuple of int): output tile size in pixels (width, height)
@@ -62,7 +78,7 @@ class ConstSizeTiles(BaseTiles):
             idx: (int) tile index between `0` and `len(tiles)`
 
         Returns:
-            (tuple) tile extent in pixels: x offset, y offset, x tile extent, y tile extent
+            (tuple) tile extent, output size in pixels
 
         If scale is 1.0, then x tile extent, y tile extent are equal to tile size
         """
@@ -77,7 +93,7 @@ class ConstSizeTiles(BaseTiles):
                                                                  self.float_overlapping_x)
         y_tile_offset, y_tile_extent = self._compute_tile_extent(y_tile_index, self.tile_extent[1],
                                                                  self.float_overlapping_y)
-        return x_tile_offset, y_tile_offset, x_tile_extent, y_tile_extent
+        return (x_tile_offset, y_tile_offset, x_tile_extent, y_tile_extent), (self.tile_size[0], self.tile_size[1])
 
     @staticmethod
     def _compute_number_of_tiles(tile_extent, image_size, min_overlapping):

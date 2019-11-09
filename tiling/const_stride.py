@@ -15,6 +15,25 @@ logger = logging.getLogger('tiling')
 class ConstStrideTiles(BaseTiles):
     """Class provides tile parameters (offset, extent) to extract data from image.
 
+    Examples:
+
+        .. code-block:: python
+
+            from tiling import ConstStrideTiles
+
+            tiles = ConstStrideTiles(image_size=(500, 500), tile_size=(256, 256), stride=(100, 100),
+                                     origin=(-100, -100),
+                                     scale=1.0,
+                                     include_nodata=True)
+
+            print("Number of tiles: %i" % len(tiles))
+            for extent, out_size in tiles:
+                x, y, width, height = extent
+                data = read_data(x, y, width, height,
+                                 out_width=out_size[0],
+                                 out_height=out_size[1])
+                print("data.shape: {}".format(data.shape))
+
     Args:
         image_size (list/tuple of int): input image size in pixels (width, height)
         tile_size (int or list/tuple of int): output tile size in pixels (width, height)
@@ -85,7 +104,7 @@ class ConstStrideTiles(BaseTiles):
             idx: (int) tile index between `0` and `len(tiles)`
 
         Returns:
-            (tuple) tile extent, output size
+            (tuple) tile extent, output size in pixels
 
         Tile extent in pixels: x offset, y offset, x tile extent, y tile extent.
         If scale is 1.0, then x tile extent, y tile extent are equal to tile size
