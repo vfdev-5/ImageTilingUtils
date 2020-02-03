@@ -1,6 +1,9 @@
 ---
 name: "\U0001F41B Bug Report"
 about: Submit a bug report to help us improve the package
+title: ''
+labels: ''
+assignees: ''
 
 ---
 
@@ -17,4 +20,3 @@ about: Submit a bug report to help us improve the package
  - OS (e.g., Linux):
  - Python version:
  - Any other relevant information:
-
