@@ -9,7 +9,7 @@ except ImportError:
 from six import with_metaclass
 
 
-__version__ = '0.3.0'
+__version__ = "0.3.0"
 
 
 class BaseTiles(with_metaclass(ABCMeta, object)):
@@ -35,8 +35,13 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
             if s < 1:
                 raise ValueError("Values of image_size should be positive")
 
-        if not (isinstance(tile_size, int) or (isinstance(tile_size, Sequence) and len(tile_size) == 2)):
-            raise TypeError("Argument tile_size should be either int or pair of integers (sx, sy)")
+        if not (
+            isinstance(tile_size, int)
+            or (isinstance(tile_size, Sequence) and len(tile_size) == 2)
+        ):
+            raise TypeError(
+                "Argument tile_size should be either int or pair of integers (sx, sy)"
+            )
         if isinstance(tile_size, int):
             tile_size = (tile_size, tile_size)
         for s in tile_size:
@@ -48,8 +53,10 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
 
         for tile_dim, img_dim in zip(tile_size, image_size):
             if int(tile_dim / scale) >= img_dim:
-                raise ValueError("Scale {} and tile size {} should not be larger "
-                                 "than image size {}".format(scale, tile_dim, img_dim))
+                raise ValueError(
+                    "Scale {} and tile size {} should not be larger "
+                    "than image size {}".format(scale, tile_dim, img_dim)
+                )
 
         self.image_size = image_size
         self.tile_size = tile_size
