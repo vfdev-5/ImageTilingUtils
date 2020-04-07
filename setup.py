@@ -5,9 +5,7 @@ from setuptools import setup, find_packages
 
 
 def read(*names):
-    with codecs_open(
-        os.path.join(os.path.dirname(__file__), *names), encoding="utf-8"
-    ) as fp:
+    with codecs_open(os.path.join(os.path.dirname(__file__), *names), encoding="utf-8") as fp:
         return fp.read()
 
 
@@ -26,7 +24,7 @@ version = find_version("tiling", "__init__.py")
 setup(
     name="tiling",
     version=version,
-    description=u"Minimalistic set of image reader agnostic tools to easily iterate over large images",
+    description="Minimalistic set of image reader agnostic tools to easily iterate over large images",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author="vfdev-5",

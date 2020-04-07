@@ -35,13 +35,8 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
             if s < 1:
                 raise ValueError("Values of image_size should be positive")
 
-        if not (
-            isinstance(tile_size, int)
-            or (isinstance(tile_size, Sequence) and len(tile_size) == 2)
-        ):
-            raise TypeError(
-                "Argument tile_size should be either int or pair of integers (sx, sy)"
-            )
+        if not (isinstance(tile_size, int) or (isinstance(tile_size, Sequence) and len(tile_size) == 2)):
+            raise TypeError("Argument tile_size should be either int or pair of integers (sx, sy)")
         if isinstance(tile_size, int):
             tile_size = (tile_size, tile_size)
         for s in tile_size:

@@ -34,9 +34,7 @@ class ConstSizeTiles(BaseTiles):
     """
 
     def __init__(self, image_size, tile_size, min_overlapping=0, scale=1.0):
-        super(ConstSizeTiles, self).__init__(
-            image_size=image_size, tile_size=tile_size, scale=scale
-        )
+        super(ConstSizeTiles, self).__init__(image_size=image_size, tile_size=tile_size, scale=scale)
 
         if not (0 <= min_overlapping < min(self.tile_extent[0], self.tile_extent[1])):
             raise ValueError(
@@ -46,12 +44,8 @@ class ConstSizeTiles(BaseTiles):
 
         self.min_overlapping = min_overlapping
         # Compute number of tiles:
-        self.nx = ConstSizeTiles._compute_number_of_tiles(
-            self.tile_extent[0], self.image_size[0], min_overlapping
-        )
-        self.ny = ConstSizeTiles._compute_number_of_tiles(
-            self.tile_extent[1], self.image_size[1], min_overlapping
-        )
+        self.nx = ConstSizeTiles._compute_number_of_tiles(self.tile_extent[0], self.image_size[0], min_overlapping)
+        self.ny = ConstSizeTiles._compute_number_of_tiles(self.tile_extent[1], self.image_size[1], min_overlapping)
 
         if self.nx < 1:
             raise ValueError(
@@ -100,9 +94,7 @@ class ConstSizeTiles(BaseTiles):
         If scale is 1.0, then x tile extent, y tile extent are equal to tile size
         """
         if idx < -self._max_index or idx >= self._max_index:
-            raise IndexError(
-                "Index %i is out of ranges %i and %i" % (idx, 0, self._max_index)
-            )
+            raise IndexError("Index %i is out of ranges %i and %i" % (idx, 0, self._max_index))
 
         idx = idx % self._max_index  # Handle negative indexing as -1 is the last
         x_tile_index = idx % self.nx

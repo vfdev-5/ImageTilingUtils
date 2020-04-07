@@ -48,22 +48,11 @@ class ConstStrideTiles(BaseTiles):
     """
 
     def __init__(
-        self,
-        image_size,
-        tile_size,
-        stride=(1, 1),
-        scale=1.0,
-        origin=(0, 0),
-        include_nodata=True,
+        self, image_size, tile_size, stride=(1, 1), scale=1.0, origin=(0, 0), include_nodata=True,
     ):
-        super(ConstStrideTiles, self).__init__(
-            image_size=image_size, tile_size=tile_size, scale=scale
-        )
+        super(ConstStrideTiles, self).__init__(image_size=image_size, tile_size=tile_size, scale=scale)
 
-        if not (
-            isinstance(stride, int)
-            or (isinstance(stride, Sequence) and len(stride) == 2)
-        ):
+        if not (isinstance(stride, int) or (isinstance(stride, Sequence) and len(stride) == 2)):
             raise TypeError("Argument stride should be (sx, sy)")
 
         if isinstance(stride, int):
@@ -73,9 +62,7 @@ class ConstStrideTiles(BaseTiles):
         stride = [int(math.floor(s / self.scale)) for s in stride]
         for v in stride:
             if v < 1:
-                raise ValueError(
-                    "Scaled stride values `floor(stride / scale)` should be larger than 1 pixel"
-                )
+                raise ValueError("Scaled stride values `floor(stride / scale)` should be larger than 1 pixel")
 
         self.stride = stride
         self.origin = origin
@@ -94,9 +81,7 @@ class ConstStrideTiles(BaseTiles):
         return self._max_index
 
     @staticmethod
-    def _compute_tile_extent(
-        idx, tile_extent, stride, origin, image_size, include_nodata
-    ):
+    def _compute_tile_extent(idx, tile_extent, stride, origin, image_size, include_nodata):
         """Method to compute tile extent: offset, extent for a given index
         """
 
@@ -133,43 +118,27 @@ class ConstStrideTiles(BaseTiles):
         Otherwise, output size is equal the input tile size.
         """
         if idx < -self._max_index or idx >= self._max_index:
-            raise IndexError(
-                "Index %i is out of ranges %i and %i" % (idx, 0, self._max_index)
-            )
+            raise IndexError("Index %i is out of ranges %i and %i" % (idx, 0, self._max_index))
 
         idx = idx % self._max_index  # Handle negative indexing as -1 is the last
         x_index = idx % self.nx
         y_index = int(idx * 1.0 / self.nx)
 
         x_offset, x_extent = self._compute_tile_extent(
-            x_index,
-            self.tile_extent[0],
-            self.stride[0],
-            self.origin[0],
-            self.image_size[0],
-            self.include_nodata,
+            x_index, self.tile_extent[0], self.stride[0], self.origin[0], self.image_size[0], self.include_nodata,
         )
         y_offset, y_extent = self._compute_tile_extent(
-            y_index,
-            self.tile_extent[1],
-            self.stride[1],
-            self.origin[1],
-            self.image_size[1],
-            self.include_nodata,
+            y_index, self.tile_extent[1], self.stride[1], self.origin[1], self.image_size[1], self.include_nodata,
         )
         x_out_size = (
             self.tile_size[0]
             if self.include_nodata
-            else self._compute_out_size(
-                x_extent, self.tile_extent[0], self.tile_size[0], self.scale
-            )
+            else self._compute_out_size(x_extent, self.tile_extent[0], self.tile_size[0], self.scale)
         )
         y_out_size = (
             self.tile_size[1]
             if self.include_nodata
-            else self._compute_out_size(
-                y_extent, self.tile_extent[1], self.tile_size[1], self.scale
-            )
+            else self._compute_out_size(y_extent, self.tile_extent[1], self.tile_size[1], self.scale)
         )
         return (x_offset, y_offset, x_extent, y_extent), (x_out_size, y_out_size)
 

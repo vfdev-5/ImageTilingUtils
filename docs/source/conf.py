@@ -135,13 +135,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (
-        master_doc,
-        "ImageTilingUtils.tex",
-        "ImageTilingUtils Documentation",
-        "vfdev-5",
-        "manual",
-    ),
+    (master_doc, "ImageTilingUtils.tex", "ImageTilingUtils Documentation", "vfdev-5", "manual",),
 ]
 
 
@@ -149,9 +143,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, "imagetilingutils", "ImageTilingUtils Documentation", [author], 1)
-]
+man_pages = [(master_doc, "imagetilingutils", "ImageTilingUtils Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------------
