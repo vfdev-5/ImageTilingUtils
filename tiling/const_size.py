@@ -3,7 +3,7 @@ import logging
 from tiling import BaseTiles, ceil_int
 
 
-logger = logging.getLogger('tiling')
+logger = logging.getLogger("tiling")
 
 
 class ConstSizeTiles(BaseTiles):
@@ -32,12 +32,15 @@ class ConstSizeTiles(BaseTiles):
         min_overlapping (int): minimal overlapping in pixels between tiles.
         scale (float): Scaling applied to the input image parameters before extracting tile's extent
     """
+
     def __init__(self, image_size, tile_size, min_overlapping=0, scale=1.0):
         super(ConstSizeTiles, self).__init__(image_size=image_size, tile_size=tile_size, scale=scale)
 
         if not (0 <= min_overlapping < min(self.tile_extent[0], self.tile_extent[1])):
-            raise ValueError("Argument min_overlapping should be between 0 and min tile_extent = tile_size / scale"
-                             ", but given {}".format(min_overlapping))
+            raise ValueError(
+                "Argument min_overlapping should be between 0 and min tile_extent = tile_size / scale"
+                ", but given {}".format(min_overlapping)
+            )
 
         self.min_overlapping = min_overlapping
         # Compute number of tiles:
@@ -45,17 +48,25 @@ class ConstSizeTiles(BaseTiles):
         self.ny = ConstSizeTiles._compute_number_of_tiles(self.tile_extent[1], self.image_size[1], min_overlapping)
 
         if self.nx < 1:
-            raise ValueError("Number of horizontal tiles is not positive. Wrong input parameters: {}, {}, {}".format(
-                self.tile_extent[0], self.image_size[0], min_overlapping))
+            raise ValueError(
+                "Number of horizontal tiles is not positive. Wrong input parameters: {}, {}, {}".format(
+                    self.tile_extent[0], self.image_size[0], min_overlapping
+                )
+            )
 
         if self.ny < 1:
-            raise ValueError("Number of vertical tiles is not positive. Wrong input parameters: {}, {}, {}".format(
-                self.tile_extent[1], self.image_size[1], min_overlapping))
+            raise ValueError(
+                "Number of vertical tiles is not positive. Wrong input parameters: {}, {}, {}".format(
+                    self.tile_extent[1], self.image_size[1], min_overlapping
+                )
+            )
 
-        self.float_overlapping_x = ConstSizeTiles._compute_float_overlapping(self.tile_extent[0],
-                                                                             self.image_size[0], self.nx)
-        self.float_overlapping_y = ConstSizeTiles._compute_float_overlapping(self.tile_extent[1],
-                                                                             self.image_size[1], self.ny)
+        self.float_overlapping_x = ConstSizeTiles._compute_float_overlapping(
+            self.tile_extent[0], self.image_size[0], self.nx
+        )
+        self.float_overlapping_y = ConstSizeTiles._compute_float_overlapping(
+            self.tile_extent[1], self.image_size[1], self.ny
+        )
         self._max_index = self.nx * self.ny
 
     def __len__(self):
@@ -89,11 +100,16 @@ class ConstSizeTiles(BaseTiles):
         x_tile_index = idx % self.nx
         y_tile_index = int(idx * 1.0 / self.nx)
 
-        x_tile_offset, x_tile_extent = self._compute_tile_extent(x_tile_index, self.tile_extent[0],
-                                                                 self.float_overlapping_x)
-        y_tile_offset, y_tile_extent = self._compute_tile_extent(y_tile_index, self.tile_extent[1],
-                                                                 self.float_overlapping_y)
-        return (x_tile_offset, y_tile_offset, x_tile_extent, y_tile_extent), (self.tile_size[0], self.tile_size[1])
+        x_tile_offset, x_tile_extent = self._compute_tile_extent(
+            x_tile_index, self.tile_extent[0], self.float_overlapping_x
+        )
+        y_tile_offset, y_tile_extent = self._compute_tile_extent(
+            y_tile_index, self.tile_extent[1], self.float_overlapping_y
+        )
+        return (
+            (x_tile_offset, y_tile_offset, x_tile_extent, y_tile_extent),
+            (self.tile_size[0], self.tile_size[1]),
+        )
 
     @staticmethod
     def _compute_number_of_tiles(tile_extent, image_size, min_overlapping):

@@ -9,7 +9,7 @@ except ImportError:
 from six import with_metaclass
 
 
-__version__ = '0.3.0'
+__version__ = "0.3.0"
 
 
 class BaseTiles(with_metaclass(ABCMeta, object)):
@@ -48,8 +48,10 @@ class BaseTiles(with_metaclass(ABCMeta, object)):
 
         for tile_dim, img_dim in zip(tile_size, image_size):
             if int(tile_dim / scale) >= img_dim:
-                raise ValueError("Scale {} and tile size {} should not be larger "
-                                 "than image size {}".format(scale, tile_dim, img_dim))
+                raise ValueError(
+                    "Scale {} and tile size {} should not be larger "
+                    "than image size {}".format(scale, tile_dim, img_dim)
+                )
 
         self.image_size = image_size
         self.tile_size = tile_size

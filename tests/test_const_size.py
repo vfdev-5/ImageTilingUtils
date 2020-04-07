@@ -1,22 +1,26 @@
-
 import unittest
 
 from tiling import ConstSizeTiles
 
 
 class TestConstSizeTiles(unittest.TestCase):
-
     def test_wrong_args(self):
 
-        assertRaisesRegex = self.assertRaisesRegex if hasattr(self, 'assertRaisesRegex') else self.assertRaisesRegexp
+        assertRaisesRegex = self.assertRaisesRegex if hasattr(self, "assertRaisesRegex") else self.assertRaisesRegexp
 
-        with assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
+        with assertRaisesRegex(
+            ValueError, "Argument min_overlapping should be between 0 and min tile_extent",
+        ):
             ConstSizeTiles((500, 500), (256, 256), min_overlapping=-1)
 
-        with assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
+        with assertRaisesRegex(
+            ValueError, "Argument min_overlapping should be between 0 and min tile_extent",
+        ):
             ConstSizeTiles((500, 500), (256, 256), min_overlapping=300)
 
-        with assertRaisesRegex(ValueError, "Argument min_overlapping should be between 0 and min tile_extent"):
+        with assertRaisesRegex(
+            ValueError, "Argument min_overlapping should be between 0 and min tile_extent",
+        ):
             ConstSizeTiles((500, 500), (256, 256), min_overlapping=256)
 
     def test_wrong_index(self):
@@ -54,15 +58,11 @@ class TestConstSizeTiles(unittest.TestCase):
             self.assertEqual(extent1, extent2)
 
     def test_all(self):
-
         def _test(im_size, ts, scale, min_overlapping):
 
-            debug_msg = "im_size={} ts={} scale={} min_overlapping={}\n" \
-                .format(im_size, ts, scale, min_overlapping)
+            debug_msg = "im_size={} ts={} scale={} min_overlapping={}\n".format(im_size, ts, scale, min_overlapping)
 
-            tiles = ConstSizeTiles((im_size, im_size), ts,
-                                   min_overlapping=min_overlapping,
-                                   scale=scale)
+            tiles = ConstSizeTiles((im_size, im_size), ts, min_overlapping=min_overlapping, scale=scale)
 
             debug_msg += "n={}\n".format(len(tiles))
             self.assertGreater(len(tiles), 0, debug_msg)
@@ -78,15 +78,15 @@ class TestConstSizeTiles(unittest.TestCase):
             for i in range(1, len(tiles)):
                 extent, _ = tiles[i]
                 prev_extent, _ = tiles[i - 1]
-                var_debug_msg = "i={} extent={}\n" \
-                    .format(i, extent)
-                var_debug_msg += "prev_extent={}\n" \
-                    .format(prev_extent)
+                var_debug_msg = "i={} extent={}\n".format(i, extent)
+                var_debug_msg += "prev_extent={}\n".format(prev_extent)
 
                 for j in [0, 1]:
-                    self.assertGreaterEqual(tiles.tile_size[j] / tiles.scale - tiles.min_overlapping,
-                                            extent[j] - prev_extent[j],
-                                            debug_msg + var_debug_msg)
+                    self.assertGreaterEqual(
+                        tiles.tile_size[j] / tiles.scale - tiles.min_overlapping,
+                        extent[j] - prev_extent[j],
+                        debug_msg + var_debug_msg,
+                    )
 
             # Check the last tile ends at the boundary
             extent, _ = tiles[-1]
